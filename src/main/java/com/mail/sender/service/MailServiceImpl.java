@@ -1,5 +1,6 @@
 package com.mail.sender.service;
 
+import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -13,28 +14,28 @@ import java.nio.charset.StandardCharsets;
 @Service
 public class MailServiceImpl implements MailService{
 
-    @Value("${email.sender}")
+    @Value("${email.user}")
     private String emailUser;
 
     @Autowired
     private JavaMailSender javaMailSender;
 
     @Override
-    public void sendEmail(String[] toUser, String subject, String text) {
+    public void sendEmail(String[] toUser, String subject, String message) {
 
         SimpleMailMessage mailMessage = new SimpleMailMessage();
 
-        mailMessage.setFrom("bryan.orellana.est@tecazuay.edu.ec");
+        mailMessage.setFrom(emailUser);
         mailMessage.setTo(toUser);
         mailMessage.setSubject(subject);
-        mailMessage.setText(text);
+        mailMessage.setText(message);
 
         javaMailSender.send(mailMessage);
 
     }
 
     @Override
-    public void sendEmailWithFile(String[] toUser, String subject, String text, File file) {
+    public void sendEmailWithFile(String[] toUser, String subject, String message, File file) {
 
         try {
 
@@ -44,12 +45,12 @@ public class MailServiceImpl implements MailService{
             mimeMessageHelper.setFrom(emailUser);
             mimeMessageHelper.setTo(toUser);
             mimeMessageHelper.setSubject(subject);
-            mimeMessageHelper.setText(text);
+            mimeMessageHelper.setText(message);
             mimeMessageHelper.addAttachment(file.getName(), file);
 
             javaMailSender.send(mimeMessage);
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (MessagingException e) {
+            throw new RuntimeException("Error al enviar el Email con un archivo." + e.getMessage());
         }
     }
 }
