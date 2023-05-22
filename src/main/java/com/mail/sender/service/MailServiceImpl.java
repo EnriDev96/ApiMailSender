@@ -8,6 +8,7 @@ import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
+
 import java.io.File;
 import java.nio.charset.StandardCharsets;
 
@@ -18,7 +19,7 @@ public class MailServiceImpl implements MailService{
     private String emailUser;
 
     @Autowired
-    private JavaMailSender javaMailSender;
+    private JavaMailSender mailSender;
 
     @Override
     public void sendEmail(String[] toUser, String subject, String message) {
@@ -30,7 +31,7 @@ public class MailServiceImpl implements MailService{
         mailMessage.setSubject(subject);
         mailMessage.setText(message);
 
-        javaMailSender.send(mailMessage);
+        mailSender.send(mailMessage);
 
     }
 
@@ -39,7 +40,7 @@ public class MailServiceImpl implements MailService{
 
         try {
 
-            MimeMessage mimeMessage = javaMailSender.createMimeMessage();
+            MimeMessage mimeMessage = mailSender.createMimeMessage();
             MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage, true, StandardCharsets.UTF_8.name());
 
             mimeMessageHelper.setFrom(emailUser);
@@ -48,7 +49,7 @@ public class MailServiceImpl implements MailService{
             mimeMessageHelper.setText(message);
             mimeMessageHelper.addAttachment(file.getName(), file);
 
-            javaMailSender.send(mimeMessage);
+            mailSender.send(mimeMessage);
         } catch (MessagingException e) {
             throw new RuntimeException("Error al enviar el Email con un archivo." + e.getMessage());
         }
